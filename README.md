@@ -13,9 +13,9 @@ Now, you can try your component by yourself from the website. [Try it now!](http
 | BrowserMajor | Major version of the browser |
 | BrowserVersion | Version of the browser |
 | CPUArchitect | If it is possible, the component detect the CPU architecture of the machine |
-| DeviceModel |     |
-| DeviceType |     |
-| DeviceVendor |     |
+| DeviceModel | Device model (if it is possible) |
+| DeviceType | Device type (if it is possible) |
+| DeviceVendor | Device Vendor (if it is possible) |
 | EngineName | Browser engine name |
 | EngineVersion | Browser engine version |
 | GPURenderer | Type of the GPU renderer |
