@@ -1,0 +1,131 @@
+﻿@page "/"
+
+<PageTitle>Index</PageTitle>
+
+<BrowserDetect @bind-BrowserInfo="@Info" />
+
+<hr />
+
+@if(Info == null)
+{
+    <p>Loading browser info...</p>
+}
+else
+{
+    <table>
+        <thead>
+            <tr>
+                <th>
+                    Property
+                </th>
+                <th>
+                    Value
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Browser Name</td>
+                <td>@Info.BrowserName</td>
+            </tr>
+            <tr>
+                <td>Browser Major</td>
+                <td>@Info.BrowserMajor</td>
+            </tr>
+            <tr>
+                <td>Browser Version</td>
+                <td>@Info.BrowserVersion</td>
+            </tr>
+            <tr>
+                <td>CPU Architect</td>
+                <td>@Info.CPUArchitect</td>
+            </tr>
+            <tr>
+                <td>Device Model</td>
+                <td>@Info.DeviceModel</td>
+            </tr>
+            <tr>
+                <td>Device Type</td>
+                <td>@Info.DeviceType</td>
+            </tr>
+            <tr>
+                <td>Device Vendor</td>
+                <td>@Info.DeviceVendor</td>
+            </tr>
+            <tr>
+                <td>Engine Name</td>
+                <td>@Info.EngineName</td>
+            </tr>
+            <tr>
+                <td>Engine Version</td>
+                <td>@Info.EngineVersion</td>
+            </tr>
+            <tr>
+                <td>
+                    GPU Renderer
+                </td>
+                <td>@Info.GPURenderer</td>
+            </tr>
+            <tr>
+                <td>
+                    GPU Vendor
+                </td>
+                <td>
+                    @Info.GPUVendor
+                </td>
+            </tr>
+            <tr>
+                <td>Is Desktop?</td>
+                <td>@Info.IsDesktop</td>
+            </tr>
+            <tr>
+                <td>Is Mobile?</td>
+                <td>@Info.IsMobile</td>
+            </tr>
+            <tr>
+                <td>Is Tablet?</td>
+                <td>@Info.IsTablet</td>
+            </tr>
+            <tr>
+                <td>Is Android?</td>
+                <td>@Info.IsAndroid</td>
+            </tr>
+            <tr>
+                <td>Is iPhone?</td>
+                <td>@Info.IsIPhone</td>
+            </tr>
+            <tr>
+                <td>Is iPad?</td>
+                <td>@Info.IsIPad</td>
+            </tr>
+            <tr>
+                <td>Is iPad Pro?</td>
+                <td>@Info.IsIPadPro</td>
+            </tr>
+            <tr>
+                <td>Operating System Name</td>
+                <td>@Info.OSName</td>
+            </tr>
+            <tr>
+                <td>Operating System Version</td>
+                <td>@Info.OSVersion</td>
+            </tr>
+            <tr>
+                <td>Screen Resolution</td>
+                <td>@Info.ScreenResolution</td>
+            </tr>
+            <tr>
+                <td>Time Zone</td>
+                <td>@Info.TimeZone</td>
+            </tr>
+            <tr>
+                <td>User Agent</td>
+                <td>@Info.UserAgent</td>
+            </tr>
+        </tbody>
+    </table>
+}
+
+@code {
+    public BrowserInfo Info { get; set; }
+}

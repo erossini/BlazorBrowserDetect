@@ -1,0 +1,24 @@
+﻿@inject IJSRuntime JSRuntime
+
+@code {
+    [Parameter]
+    public BrowserInfo browserInfo { get; set; }
+
+    [Parameter]
+    public EventCallback<BrowserInfo> BrowserInfoChanged { get; set; }
+
+    protected BrowserDetectJsInterop JSModule { get; private set; }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            JSModule = new BrowserDetectJsInterop(JSRuntime);
+
+            browserInfo = await JSModule.BrowserInfo();
+            await BrowserInfoChanged.InvokeAsync(browserInfo);
+        }
+
+        //return base.OnAfterRenderAsync(firstRender);
+    }
+}
