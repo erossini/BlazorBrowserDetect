@@ -1,7 +1,9 @@
 # Browser Detect for Blazor
-This is a browser detect component for [Blazor WebAssembly](https://www.puresourcecode.com/tag/blazor-webassembly/) and [Blazor Server](https://www.puresourcecode.com/tag/blazor-server/) with .NET6. If you need help or info about it, leave your message in the [Forum](https://www.puresourcecode.com/forum/browser-detect-for-blazor/).
+This is a browser detect component for [Blazor WebAssembly](https://www.puresourcecode.com/tag/blazor-webassembly/) and [Blazor Server](https://www.puresourcecode.com/tag/blazor-server/) with .NET6. If you need help or info about it, leave your message in the [Forum](https://www.puresourcecode.com/forum/browser-detect-for-blazor/). Read the full post on [PureSourceCode.com](https://www.puresourcecode.com/dotnet/blazor/browser-detect-component-for-blazor/).
 
 Now, you can try your component by yourself from the website. [Try it now!](https://browserdetect.puresourcecode.com/)
+
+![browsers](https://user-images.githubusercontent.com/9497415/153390277-3c9ef12c-5e4e-488e-bc3b-c02d84da5195.jpg)
 
 ## Detected capabilites or properties
 
