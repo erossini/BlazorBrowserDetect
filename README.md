@@ -47,3 +47,6 @@ Now, you can try your component by yourself from the website. [Try it now!](http
 
 ## iPad
 ![image](https://user-images.githubusercontent.com/9497415/153380116-819ea3bc-1a6f-4d86-9213-24f092fc7372.png)
+
+## iMac
+<img width="1893" alt="Screenshot 2022-02-10 at 09 42 16" src="https://user-images.githubusercontent.com/9497415/153380566-bea2447f-e025-40c2-9693-32c4962f9b70.png">
