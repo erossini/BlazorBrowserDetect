@@ -9,29 +9,29 @@ Now, you can try your component by yourself from the website. [Try it now!](http
 
 | Property | Value |
 | --- | --- |
-| Browser Name | Name of the browser |
-| Browser Major | Major version of the browser |
-| Browser Version | Version of the browser |
-| CPU Architect | If it is possible, the component detect the CPU architecture of the machine |
-| Device Model | Device Model |
-| Device Type | Device Type |
-| Device Vendor | Device Vendor |
-| Engine Name | Browser engine name |
-| Engine Version | Browser engine version |
-| GPU Renderer | Type of the GPU renderer |
-| GPU Vendor | Vendor of the GPU |
-| Is Desktop? | Detect if the device is a desktop computer |
-| Is Mobile? | Detect if the device is a mobile |
-| Is Tablet? | Detect if the device is a tablet |
-| Is Android? | Detect if the device is an Android device |
-| Is iPhone? | Detect if the device is an iPhone or iPod |
-| Is iPad? | Detect if the device is an iPad (any version) |
-| Is iPad Pro? | Detect if the device is an iPad Pro |
-| Operating System Name | Detect the operating system |
-| Operating System Version | Version of the operating system |
-| Screen Resolution | Detect the screen resolution |
-| Time Zone | Read the time zone |
-| User Agent | The full user agent |
+| BrowserName | Name of the browser |
+| BrowserMajor | Major version of the browser |
+| BrowserVersion | Version of the browser |
+| CPUArchitect | If it is possible, the component detect the CPU architecture of the machine |
+| DeviceModel |     |
+| DeviceType |     |
+| DeviceVendor |     |
+| EngineName | Browser engine name |
+| EngineVersion | Browser engine version |
+| GPURenderer | Type of the GPU renderer |
+| GPUVendor | Vendor of the GPU |
+| IsDesktop | Detect if the device is a desktop computer |
+| IsMobile | Detect if the device is a mobile |
+| IsTablet | Detect if the device is a tablet |
+| IsAndroid | Detect if the device is an Android device |
+| IsIPhone | Detect if the device is an iPhone or iPod |
+| IsIPad | Detect if the device is an iPad (any version) |
+| IsIPadPro | Detect if the device is an iPad Pro |
+| OSName | Detect the operating system |
+| OSVersion | Version of the operating system |
+| ScreenResolution | Detect the screen resolution |
+| TimeZone | Read the time zone |
+| UserAgent | The full user agent |
 
 ## Screenhot
 
