@@ -1,7 +1,11 @@
 # Browser Detect for Blazor
 This is a browser detect component for [Blazor WebAssembly](https://www.puresourcecode.com/tag/blazor-webassembly/) and [Blazor Server](https://www.puresourcecode.com/tag/blazor-server/) with .NET6. 
 
-> If you need help, info or some device is not detected correctly, leave your message in the [Forum](https://www.puresourcecode.com/forum/browser-detect-for-blazor/). Read the full post on [PureSourceCode.com](https://www.puresourcecode.com/dotnet/blazor/browser-detect-component-for-blazor/).
+> If you need help, info or some device is not detected correctly, leave your message in the [Forum](https://www.puresourcecode.com/forum/browser-detect-for-blazor/). 
+
+Read the full post on [PureSourceCode.com](https://www.puresourcecode.com/dotnet/blazor/browser-detect-component-for-blazor-2/).
+- [Version 1.0.8](https://www.puresourcecode.com/dotnet/blazor/browser-detect-component-for-blazor-2/).
+- [First version](https://www.puresourcecode.com/dotnet/blazor/browser-detect-component-for-blazor)
 
 Now, you can try your component by yourself from the website. [Try it now!](https://browserdetect.puresourcecode.com/)
 
