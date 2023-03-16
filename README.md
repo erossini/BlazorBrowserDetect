@@ -4,7 +4,7 @@ This is a browser detect component for [Blazor WebAssembly](https://www.puresour
 > If you need help, info or some device is not detected correctly, leave your message in the [Forum](https://www.puresourcecode.com/forum/browser-detect-for-blazor/). 
 
 Read the full post on [PureSourceCode.com](https://www.puresourcecode.com):
-- [Version 1.0.9](https://www.puresourcecode.com/dotnet/blazor/browser-detect-component-for-blazor-2/)
+- [Version 1.0.10](https://www.puresourcecode.com/dotnet/blazor/browser-detect-component-for-blazor-2/)
 - [First version](https://www.puresourcecode.com/dotnet/blazor/browser-detect-component-for-blazor)
 
 Now, you can try your component by yourself from the website. [Try it now!](https://browserdetect.puresourcecode.com/)
@@ -39,49 +39,55 @@ Now, you can try your component by yourself from the website. [Try it now!](http
 | TimeZone | Read the time zone |
 | UserAgent | The full user agent |
 
-### Detecting Windows
+### Detecting the operating system and the architecture
 
 To detect the browser and all the other details from the user, it is not always accurate. For example, if the client has `Windows 11` there is no way to
-return the correct version of the operating system. The JavaScript can detect the `OSName`, in this case `Windows` but not the exact version.
+return the correct version of the operating system. If you have a `MacOS`, again JavaScript can't detect from the `navigator` string any info.
+The JavaScript can detect the `OSName`, `Windows` or `MacOS` but not the exact version.
 
 To detect in a correct way the correct version of the operating system and the architecture of the CPU, the component has to run few tests that take time.
 
 For this reason I added 2 events in the component:
 
-- WindowsArchitectureUpdate
-- WindowsVersionUpdate
+- OSArchitectureUpdate
+- OSVersionUpdate
 
-So, if you want to receive the notification when of the correct version of Windows and the CPU architecture, the component is like this code:
+So, if you want to receive the notification when of the correct version of the operating system and the CPU architecture, the component is like this code:
 
 ```
 <BrowserDetect @bind-BrowserInfo="@Info" 
-               WindowsArchitectureUpdate="WindowsArchitectureString"
-               WindowsVersionUpdate="WindowsUpdateString" />
+               OSArchitectureUpdate="WindowsArchitectureString"
+               OSVersionUpdate="WindowsUpdateString" />
 ```
 
 then the functions look like
 
 ```csharp
 public BrowserInfo? Info { get; set; }
-public string? WindowsInfo { get; set; } = "";
-public string? WindowsCPUInfoString { get; set; }
+public string? OSInfo { get; set; } = "";
+public string? OSCPUInfoString { get; set; }
 
-private void WindowsArchitectureString(string cpu)
+private void OSArchitectureString(string cpu)
 {
-    WindowsCPUInfoString = cpu;
+    OSCPUInfoString = cpu;
 }
 
-private void WindowsUpdateString(string version)
+private void OSUpdateString(string version)
 {
-    WindowsInfo = version;
+    OSInfo = version;
 }
 ```
 
 Both events return a simple string with the values. For example:
 
-- if the operating system is `Windows 11`, the `WindowsUpdateString` receives the string `11`; 
-- if the operating system is `Windows 10 1809`, the `WindowsUpdateString` receives the string `10 (1809)`
-- if the CPU is 32 bit, the `WindowsArchitectureString`, receives the string `x86`
+- if the operating system is `Windows 11`, the `OSUpdateString` receives the string `11`; 
+- if the operating system is `Windows 10 1809`, the `OSUpdateString` receives the string `10 (1809)`
+- if the CPU is 32 bit, the `OSArchitectureString`, receives the string `x86`
+
+#### Mac Architecture
+
+- ARM
+- ARM 64
 
 #### Windows Architecture Values
 
