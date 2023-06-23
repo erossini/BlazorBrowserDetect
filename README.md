@@ -11,6 +11,13 @@ Now, you can try your component by yourself from the website. [Try it now!](http
 
 ![browsers](https://user-images.githubusercontent.com/9497415/153390277-3c9ef12c-5e4e-488e-bc3b-c02d84da5195.jpg)
 
+## Installation
+Fist, you have to add the component from [NuGet](https://www.nuget.org/packages/PSC.Blazor.Components.BrowserDetect/). Then, open your `_Imports.razor` and add the following:
+
+```
+@using PSC.Blazor.Components.BrowserDetect
+```
+
 ## Detected capabilities or properties
 
 | Property | Value |
