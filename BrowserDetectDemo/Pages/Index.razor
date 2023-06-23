@@ -1,8 +1,18 @@
 ﻿@page "/"
 
-<PageTitle>Index</PageTitle>
+<PageTitle>Demo for Browser Detect component for Blazor</PageTitle>
 
-<BrowserDetect @bind-BrowserInfo="@Info" />
+<p>This is the demo website for the Browser Detect component for 
+    <a href="https://www.puresourcecode.com/tag/blazor-webassembly/">Blazor WebAssembly</a> and 
+    <a href="https://www.puresourcecode.com/tag/blazor-server/">Blazor Server</a> with .NET6. 
+    Firstly, if you need help or info about this component, read the 
+    <a href="https://www.puresourcecode.com/dotnet/blazor/browser-detect-component-for-blazor/" target="_blank">post about this component</a> 
+    and leave your message in the <a href="https://www.puresourcecode.com/forum/browser-detect-for-blazor/">Forum</a>. Now I'm detecting <code>Windows 11</code>!
+</p>
+
+<BrowserDetect @bind-BrowserInfo="@Info"
+               OSArchitectureUpdate="OSArchitectureString"
+               OSVersionUpdate="OSUpdateString" />
 
 <hr />
 
@@ -38,7 +48,7 @@ else
             </tr>
             <tr>
                 <td>CPU Architect</td>
-                <td>@Info.CPUArchitect</td>
+                <td>@(CPUInfoString ?? Info.CPUArchitect)</td>
             </tr>
             <tr>
                 <td>Device Model</td>
@@ -108,7 +118,9 @@ else
             </tr>
             <tr>
                 <td>Operating System Version</td>
-                <td>@Info.OSVersion</td>
+                <td>
+                    @(OSInfo ?? Info.OSVersion)
+                </td>
             </tr>
             <tr>
                 <td>Screen Resolution</td>
@@ -126,6 +138,20 @@ else
     </table>
 }
 
+<p></p>
+
 @code {
-    public BrowserInfo Info { get; set; }
+    public BrowserInfo? Info { get; set; }
+    public string? OSInfo { get; set; } = "";
+    public string? CPUInfoString { get; set; }
+
+    private void OSArchitectureString(string cpu)
+    {
+        CPUInfoString = cpu;
+    }
+
+    private void OSUpdateString(string version)
+    {
+        OSInfo = version;
+    }
 }

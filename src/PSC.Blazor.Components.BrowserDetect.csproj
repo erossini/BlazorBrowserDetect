@@ -11,6 +11,9 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <RepositoryType>git</RepositoryType>
     <Copyright>Enrico Rossini - PureSourceCode.com</Copyright>
+    <PackageProjectUrl>https://www.puresourcecode.com/dotnet/blazor/browser-detect-component-for-blazor-2/</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/erossini/BlazorBrowserDetect</RepositoryUrl>
+    <PackageTags>blazor, blazor-webassembly, blazor-server, browser, detect, </PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

@@ -13,18 +13,31 @@ namespace PSC.Blazor.Components.BrowserDetect
     {
         private readonly Lazy<Task<IJSObjectReference>> moduleTask;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="BrowserDetectJsInterop"/> class.
+        /// </summary>
+        /// <param name="jsRuntime">The js runtime.</param>
         public BrowserDetectJsInterop(IJSRuntime jsRuntime)
         {
             moduleTask = new(() => jsRuntime.InvokeAsync<IJSObjectReference>("import", 
                 "./_content/PSC.Blazor.Components.BrowserDetect/js/browserDetect.js").AsTask());
         }
 
-        public async ValueTask<BrowserInfo> BrowserInfo()
+        /// <summary>
+        /// Browsers the information.
+        /// </summary>
+        /// <param name="dotNetObjectRef">The dot net object reference.</param>
+        /// <returns>BrowserInfo.</returns>
+        public async ValueTask<BrowserInfo> BrowserInfo(DotNetObjectReference<BrowserDetect> dotNetObjectRef)
         {
             var module = await moduleTask.Value;
-            return await module.InvokeAsync<BrowserInfo>("browserDetect");
+            return await module.InvokeAsync<BrowserInfo>("browserDetect", dotNetObjectRef);
         }
 
+        /// <summary>
+        /// Dispose as an asynchronous operation.
+        /// </summary>
+        /// <returns>A Task&lt;ValueTask&gt; representing the asynchronous operation.</returns>
         public async ValueTask DisposeAsync()
         {
             if (moduleTask.IsValueCreated)

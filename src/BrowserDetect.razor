@@ -1,13 +1,29 @@
 ﻿@inject IJSRuntime JSRuntime
 
 @code {
+    #region Inject and JavaScript
+
+    /// <summary>
+    /// The dotnet object reference
+    /// </summary>
+    private DotNetObjectReference<BrowserDetect>? dotNetObjectRef;
+
+    #endregion
+    #region Parameters
     [Parameter]
-    public BrowserInfo browserInfo { get; set; }
+    public BrowserInfo? browserInfo { get; set; }
 
     [Parameter]
     public EventCallback<BrowserInfo> BrowserInfoChanged { get; set; }
 
-    protected BrowserDetectJsInterop JSModule { get; private set; }
+    [Parameter]
+    public EventCallback<string> OSVersionUpdate { get; set; }
+
+    [Parameter]
+    public EventCallback<string> OSArchitectureUpdate { get; set; }
+    #endregion
+
+    protected BrowserDetectJsInterop? JSModule { get; private set; }
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
@@ -15,10 +31,24 @@
         {
             JSModule = new BrowserDetectJsInterop(JSRuntime);
 
-            browserInfo = await JSModule.BrowserInfo();
+            dotNetObjectRef ??= DotNetObjectReference.Create(this);
+
+            browserInfo = await JSModule.BrowserInfo(dotNetObjectRef);
             await BrowserInfoChanged.InvokeAsync(browserInfo);
         }
+    }
 
-        //return base.OnAfterRenderAsync(firstRender);
+    [JSInvokable]
+    public async Task OSUpdateString(string version)
+    {
+        await OSVersionUpdate.InvokeAsync(version);
+        await InvokeAsync(StateHasChanged);
+    }
+
+    [JSInvokable]
+    public async Task OSArchitectureUpdateString(string cpu)
+    {
+        await OSArchitectureUpdate.InvokeAsync(cpu);
+        await InvokeAsync(StateHasChanged);
     }
 }

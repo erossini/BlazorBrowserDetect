@@ -1,4 +1,4 @@
-export function browserDetect() {
+export function browserDetect(dotNetObjectRef) {
     var parser = new UAParser();
     var result = parser.getResult();
 
@@ -29,6 +29,104 @@ export function browserDetect() {
         deviceModel = getModels().toString();
     }
 
+    var osName = parser.getOS().name;
+    var osVersion = parser.getOS().version;
+
+    var winVer = '';
+
+    if (typeof navigator.userAgentData !== 'undefined') {
+        navigator.userAgentData.getHighEntropyValues(["platformVersion"])
+            .then(ua => {
+                if (navigator.userAgentData.platform === "Windows") {
+                    var majorPlatformVersion = parseInt(ua.platformVersion.split('.')[0]);
+                    if (majorPlatformVersion >= 13) {
+                        winVer = "11 or later";
+                    }
+                    else {
+                        switch (majorPlatformVersion) {
+                            case 0:
+                                winVer = "7/8/8.1";
+                                break;
+                            case 1:
+                                winVer = "10 (1507)";
+                                break;
+                            case 2:
+                                winVer = "10 (1511)";
+                                break;
+                            case 3:
+                                winVer = "10 (1607)";
+                                break;
+                            case 4:
+                                winVer = "10 (1703)";
+                                break;
+                            case 5:
+                                winVer = "10 (1709)";
+                                break;
+                            case 6:
+                                winVer = "10 (1803)";
+                                break;
+                            case 7:
+                                winVer = "10 (1809)";
+                                break;
+                            case 8:
+                                winVer = "10 (1903 or 10 1909)";
+                                break;
+                            case 10:
+                                winVer = "10 (2004 or 20H2 or 21H1 or 21H2)";
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+
+                    osVersion = winVer;
+
+                    dotNetObjectRef.invokeMethodAsync('OSUpdateString', winVer).then(null, function (err) {
+                        throw new Error(err);
+                    });
+                }
+                else if (navigator.userAgentData.platform === "macOS") {
+                    var macVer = ua.platformVersion;
+                    dotNetObjectRef.invokeMethodAsync('OSUpdateString', macVer).then(null, function (err) {
+                        throw new Error(err);
+                    });
+                }
+            });
+
+        navigator.userAgentData.getHighEntropyValues(["architecture", "bitness"])
+            .then(ua => {
+                if (navigator.userAgentData.platform === "Windows") {
+                    var winCPU = '';
+                    if (ua.architecture === 'x86') {
+                        if (ua.bitness === '64') {
+                            winCPU = "x86_64";
+                        }
+                        else if (ua.bitness === '32') {
+                            winCPU = "x86";
+                        }
+                    }
+                    else if (ua.architecture === 'arm') {
+                        if (ua.bitness === '64') {
+                            winCPU = "ARM64";
+                        }
+                        else if (ua.bitness === '32') {
+                            winCPU = "ARM32";
+                        }
+                    }
+
+                    dotNetObjectRef.invokeMethodAsync('OSArchitectureUpdateString', winCPU).then(null, function (err) {
+                        throw new Error(err);
+                    });
+                }
+                else if (navigator.userAgentData.platform === "macOS") {
+                    var macCPU = ua.architecture + ' ' + ua.bitness;
+                    dotNetObjectRef.invokeMethodAsync('OSArchitectureUpdateString', macCPU).then(null, function (err) {
+                        throw new Error(err);
+                    });
+                }
+            });
+    }
+
     var rtn = {
         BrowserMajor: result.browser.major ?? '',
         BrowserName: result.browser.name ?? '',
@@ -41,15 +139,15 @@ export function browserDetect() {
         EngineVersion: result.engine.version ?? '',
         GPURenderer: gl.glRenderer,
         GPUVendor: gl.glVendor,
-        IsDesktop: IsDesktop(),
+        IsDesktop: isDesktop(),
         IsMobile: isMobile ?? false,
         IsTablet: isTablet ?? false,
         IsAndroid: isAndroid ?? false,
         IsIPhone: isiPhone ?? false,
         IsIPad: isiPad ?? false,
         isIpadPro: isiPadPro(),
-        OSName: parser.getOS().name,
-        OSVersion: parser.getOS().version,
+        OSName: osName,
+        OSVersion: osVersion,
         ScreenResolution: (window.screen.width * window.devicePixelRatio) + 'x' + (window.screen.height * window.devicePixelRatio),
         TimeZone: timeZone,
         UserAgent: agent
@@ -87,7 +185,7 @@ function isiPadPro() {
         (screen.width === 2048 && screen.height === 1536);
 }
 
-function IsDesktop() {
+function isDesktop() {
     if ((navigator.userAgent.match(/iPhone/i)) ||
         (navigator.userAgent.match(/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|vodafone|o2|pocket|kindle|mobile|pda|psp|treo)/i)) ||
         (navigator.userAgent.match(/iPod/i)) ||
@@ -298,7 +396,6 @@ function getDeviceInfo() {
     //////////////
     // Constants
     /////////////
-
 
     var LIBVERSION = '0.7.31',
         EMPTY = '',
