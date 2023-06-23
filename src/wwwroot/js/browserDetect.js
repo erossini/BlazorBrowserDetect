@@ -20,11 +20,12 @@ export function browserDetect(dotNetObjectRef) {
     var deviceModel = result.device.model ?? '';
     var deviceType = result.device.type ?? '';
 
-    if (deviceModel === '' && isiPad) {
+    console.log('Device model ->' + deviceModel);
+    if (deviceModel === 'iPad' || isiPad) {
         deviceType = 'iPad';
         deviceModel = getModels().toString();
     }
-    else if (deviceModel === '' && isiPhone) {
+    else if (deviceModel === 'iPhone' || isiPhone) {
         deviceType = 'iPhone';
         deviceModel = getModels().toString();
     }
@@ -300,7 +301,9 @@ var canvas, gl, glRenderer, models,
         ['a12', '1125x2436', ['iPhone Xs']],
         ['a12', '1242x2688', ['iPhone Xs Max']],
         ['a12x', '1668x2388', ['iPad Pro (3rd gen 11-inch)']],
-        ['a12x', '2048x2732', ['iPad Pro (3rd gen 12.9-inch)']]
+        ['a12x', '2048x2732', ['iPad Pro (3rd gen 12.9-inch)']],
+        ['a15', '2556x1179', ['iPhone 14']],
+        ['a15', '2796x1290', ['iPhone 14 Max']]
     ];
 
 function getCanvas() {
@@ -347,7 +350,7 @@ function getGlRenderer() {
 }
 
 function getModels() {
-    if (models == null) {
+    if (models === undefined) {
         var gpu = getGlRenderer();
         var matches = gpu.glRenderer.toLowerCase().includes('apple');
         var res = getResolution();
@@ -358,7 +361,8 @@ function getModels() {
             for (var i = 0; i < devices.length; i++) {
                 var device = devices[i];
 
-                if (res == device[1]) {
+                var res2 = res.split('x').reverse().join('x');
+                if (res == device[1] || res2 == device[1]) {
                     models = device[2];
                     break;
                 }
