@@ -1,5 +1,7 @@
 # Browser Detect for Blazor
-This is a browser detect component for [Blazor WebAssembly](https://www.puresourcecode.com/tag/blazor-webassembly/) and [Blazor Server](https://www.puresourcecode.com/tag/blazor-server/) with .NET6. 
+This is a browser detect component for [Blazor WebAssembly](https://www.puresourcecode.com/tag/blazor-webassembly/) and [Blazor Server](https://www.puresourcecode.com/tag/blazor-server/) with [.NET10](https://puresourcecode.com/category/dotnet/net10/). 
+
+[![Donate](https://img.shields.io/badge/donate-Enrico%3A%20Support%20My%20Work%20%E2%9D%A4%EF%B8%8F-ec4899?style=flat-square&logo=github-sponsors&logoColor=white)](https://flnk.it/github-appreciation?src=github)
 
 > If you need help, info or some device is not detected correctly, leave your message in the [Forum](https://www.puresourcecode.com/forum/browser-detect-for-blazor/). 
 
@@ -12,10 +14,127 @@ Now, you can try your component by yourself from the website. [Try it now!](http
 ![browsers](https://user-images.githubusercontent.com/9497415/153390277-3c9ef12c-5e4e-488e-bc3b-c02d84da5195.jpg)
 
 ## Installation
-Fist, you have to add the component from [NuGet](https://www.nuget.org/packages/PSC.Blazor.Components.BrowserDetect/). Then, open your `_Imports.razor` and add the following:
 
+Install the NuGet package:
+
+```bash
+dotnet add package PSC.Blazor.Components.BrowserDetect
 ```
+
+Then, open your `_Imports.razor` and add:
+
+```razor
 @using PSC.Blazor.Components.BrowserDetect
+```
+
+No service registration or script references are needed — the component is self-contained.
+
+## Quick Start
+
+### Basic Usage
+
+Add the component to any Blazor page or layout:
+
+```razor
+<BrowserDetect @bind-BrowserInfo="@Info" />
+
+@if (Info is not null)
+{
+    <p>Browser: @Info.BrowserName @Info.BrowserVersion</p>
+    <p>OS: @Info.OSName @Info.OSVersion</p>
+    <p>Device: @(Info.IsMobile == true ? "Mobile" : Info.IsTablet == true ? "Tablet" : "Desktop")</p>
+    <p>Screen: @Info.ScreenResolution</p>
+    <p>GPU: @Info.GPURenderer</p>
+}
+
+@code {
+    public BrowserInfo? Info { get; set; }
+}
+```
+
+### With OS and Architecture Updates
+
+For precise OS version and CPU architecture detection (uses the async [User-Agent Client Hints API](https://developer.mozilla.org/en-US/docs/Web/API/NavigatorUAData)):
+
+```razor
+<BrowserDetect @bind-BrowserInfo="@Info"
+               OSArchitectureUpdate="OnArchitecture"
+               OSVersionUpdate="OnOsVersion" />
+
+@code {
+    public BrowserInfo? Info { get; set; }
+    private string? osVersion;
+    private string? cpuArchitecture;
+
+    private void OnOsVersion(string version)
+    {
+        osVersion = version; // e.g. "11" for Windows 11
+        StateHasChanged();
+    }
+
+    private void OnArchitecture(string arch)
+    {
+        cpuArchitecture = arch; // e.g. "x86_64", "ARM64"
+        StateHasChanged();
+    }
+}
+```
+
+### In a Layout (detect once, use everywhere)
+
+Place the component in your `MainLayout.razor` to detect the browser once and make the info available throughout the app:
+
+```razor
+@inherits LayoutComponentBase
+
+<BrowserDetect @bind-BrowserInfo="@BrowserInfo" />
+
+<CascadingValue Value="@BrowserInfo">
+    @Body
+</CascadingValue>
+
+@code {
+    public BrowserInfo? BrowserInfo { get; set; }
+}
+```
+
+Then in any child page:
+
+```razor
+@code {
+    [CascadingParameter]
+    public BrowserInfo? Browser { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        if (Browser?.IsMobile == true)
+        {
+            // Adapt layout for mobile
+        }
+    }
+}
+```
+
+### Conditional Rendering Based on Device
+
+```razor
+<BrowserDetect @bind-BrowserInfo="@Info" />
+
+@if (Info?.IsMobile == true)
+{
+    <MobileNavigation />
+}
+else
+{
+    <DesktopNavigation />
+}
+
+@if (Info?.BrowserName == "Safari")
+{
+    <div class="alert alert-info">
+        For the best experience, we recommend Chrome or Edge.
+    </div>
+}
 ```
 
 ## Detected capabilities or properties
@@ -123,6 +242,28 @@ Both events return a simple string with the values. For example:
 | Win10 21H2 | 10 (2004 or 20H2 or 21H1 or 21H2) |
 | Win11      | 11                                |
 
+### Device model detection
+
+The component makes a best-effort attempt to fill `DeviceModel` for Apple hardware,
+since the User-Agent string never contains the model name.
+
+- **iPhone / iPad** — the model is guessed from the screen resolution against a
+  built-in lookup table, current through the iPhone 17 / iPhone Air and iPad Air
+  (M3) generation. Apple reuses the same panel resolution across models (for
+  example iPhone 16 Pro, iPhone 17 and iPhone 17 Pro are all `1206x2622`), so
+  `DeviceModel` may contain a comma-separated list of candidates rather than a
+  single model.
+- **macOS** — the component inspects the WebGL renderer. A Mac reporting an
+  **A-series GPU** is identified as a **MacBook Neo** (the only Mac with an
+  A-series chip). On Chrome, Edge and Firefox this works; **Safari masks the
+  renderer**, so on Safari only the resolution fallback is available.
+
+> ⚠️ MacBook Neo detection has not yet been verified against real hardware. If
+> the model is not detected correctly, please report the WebGL renderer string
+> from your device on the
+> [Forum](https://www.puresourcecode.com/forum/browser-detect-for-blazor/) so the
+> detection pattern can be tightened.
+
 ## Screenshot
 
 ### Windows 11
@@ -146,6 +287,64 @@ Both events return a simple string with the values. For example:
 ## iMac
 <img width="1893" alt="Screenshot 2022-02-10 at 09 42 16" src="https://user-images.githubusercontent.com/9497415/153380566-bea2447f-e025-40c2-9693-32c4962f9b70.png">
 
+
+## Server-Side Analytics Enrichment
+
+BrowserDetect can be used beyond the Blazor component — the same detection logic powers **server-side analytics enrichment** for visitor tracking.
+
+### How It Works
+
+A lightweight JavaScript file (`browser-enrich.js`) runs on rendered pages to detect browser details that aren't available from the User-Agent string alone, then sends the data to a server endpoint for storage.
+
+**Detected on the client side:**
+
+| Property | Source | Example |
+|---|---|---|
+| Screen Resolution | `screen.width × screen.height × devicePixelRatio` | `3840x2160` |
+| Device Model | WebGL `UNMASKED_RENDERER_WEBGL` | `Apple M2 Pro GPU` |
+| Device Vendor | WebGL `UNMASKED_VENDOR_WEBGL` | `Apple Inc.` |
+| GPU Renderer | WebGL debug renderer info | `ANGLE (NVIDIA GeForce RTX 3080)` |
+| Engine Name | User-Agent pattern matching | `Blink`, `WebKit`, `Gecko` |
+| Engine Version | User-Agent regex | `537.36` |
+| Timezone | `Intl.DateTimeFormat().resolvedOptions().timeZone` | `Europe/London` |
+
+**Combined with server-side detection:**
+
+| Property | Source | Example |
+|---|---|---|
+| Browser + Version | User-Agent regex | `Chrome 126` |
+| Operating System + Version | User-Agent regex | `Windows 10/11` |
+| Device Type | User-Agent pattern matching | `Desktop`, `Mobile`, `Tablet` |
+| Country, City | GeoIP lookup (MaxMind) | `United Kingdom`, `London` |
+| ISP, Connection Type | GeoIP lookup | `BT`, `cable` |
+
+### Integration Pattern
+
+```javascript
+// browser-enrich.js — include in your page
+(function(){
+    var info = detect(); // browser, OS, screen, GPU, timezone
+    navigator.sendBeacon('/api/analytics/enrich',
+        new Blob([JSON.stringify(info)], {type:'application/json'}));
+})();
+```
+
+```csharp
+// Server endpoint enriches the record
+app.MapPost("/api/analytics/enrich", async (EnrichRequest request, DbContext db) =>
+{
+    var record = await db.FindMatchingRecord(request);
+    if (record != null)
+    {
+        record.ScreenResolution = request.ScreenResolution;
+        record.DeviceModel = request.DeviceModel;
+        record.GpuRenderer = request.GpuRenderer;
+        record.EngineName = request.EngineName;
+        record.TimeZone = request.TimeZone;
+        await db.SaveChangesAsync();
+    }
+});
+```
 
 ---
     
@@ -215,3 +414,31 @@ My name is Enrico Rossini and you can contact me via:
 ### Blazor & NET8
 * [Custom User Management with NET8 and Blazor (1st part)](https://puresourcecode.com/dotnet/blazor/custom-user-management-with-net8-and-blazor/)
 * [NET8, Blazor and Custom User Management (2nd part)](https://puresourcecode.com/dotnet/blazor/net8-blazor-and-custom-user-management/)
+
+---
+
+## 👋 About the author & more from me
+
+This library is built and maintained by **[Enrico Rossini](https://flnk.it/enrico)** — .NET architect, Blazor advocate, and indie maker.
+
+If this project helped you, here are a few more things from me you might like:
+
+### 📝 My blog — [PureSourceCode.com](https://www.puresourcecode.com)
+Deep-dives on Blazor, .NET, JavaScript frameworks, DevOps, and real-world engineering problems. 10+ years of articles, demos, and open-source components.
+
+### 🚀 [FastLinkIt (flnk.it)](https://flnk.it) — My SaaS platform
+A full-stack platform for link shortening, QR codes, link-in-bio pages, contact management, email campaigns, event booking, payments & donations, service requests, AI doc chat, and more. Free tier available, no credit card required.
+
+### 💼 Sell your code on FastLinkIt
+Got a library, NuGet package, template, or digital product? Sell it through **[flnk.it/features/sell-code](https://flnk.it/features/sell-code)** — private NuGet feed for buyers, one-command install, Stripe Connect payouts, licence keys, no monthly fees. You keep the money, I keep the platform running.
+
+### 🌍 [LanguageInUse.com](https://languageinuse.com) — Language learning, reinvented
+My other project: an app for learning languages through real-world usage patterns instead of textbooks. [Visit](https://languageinuse.com) and give it a try and search the apps in your app store.
+
+### 🤝 Support this work
+- ⭐ Star this repo on GitHub
+- 🐛 [Open an issue](../../issues) for bugs or feature requests
+- 💬 Follow me on [LinkedIn](https://www.linkedin.com/in/erossini/)
+- ☕ [Buy me a coffee](https://www.buymeacoffee.com/erossini) (optional)
+
+Thanks for using this project. 🙏

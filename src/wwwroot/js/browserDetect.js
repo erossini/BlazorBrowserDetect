@@ -1,12 +1,20 @@
+let cachedParserResult = null;
+
 export function browserDetect(dotNetObjectRef) {
-    var parser = new UAParser();
+    // Qualify with window. — when this file is loaded as an ES module (which is how
+    // BrowserDetectJsInterop calls it via dynamic `import`), it runs in strict mode
+    // and bare identifiers are not resolved against `window`. The IIFE at the bottom
+    // of this file exports UAParser as `window.UAParser`, so the property access
+    // form works in both <script> and ES-module contexts.
+    var parser = new window.UAParser();
     var result = parser.getResult();
 
     var gl = getGlRenderer();
+    var uaLower = navigator.userAgent.toLowerCase();
 
-    var isMobile = navigator.userAgent.toLowerCase().indexOf('mobile') > -1 ?? (isiOS()),
-        isTablet = navigator.userAgent.toLowerCase().indexOf('tablet') > -1 ?? (isiPadOS() || isiPadPro()),
-        isAndroid = navigator.userAgent.toLowerCase().indexOf('android') > -1,
+    var isMobile = uaLower.indexOf('mobile') > -1 || isiOS(),
+        isTablet = uaLower.indexOf('tablet') > -1 || isiPadOS() || isiPadPro(),
+        isAndroid = uaLower.indexOf('android') > -1,
         isiPhone = isiOS(),
         isiPad = isiPadOS() || isiPadPro();
 
@@ -20,7 +28,6 @@ export function browserDetect(dotNetObjectRef) {
     var deviceModel = result.device.model ?? '';
     var deviceType = result.device.type ?? '';
 
-    console.log('Device model ->' + deviceModel);
     if (deviceModel === 'iPad' || isiPad) {
         deviceType = 'iPad';
         deviceModel = getModels().toString();
@@ -32,6 +39,15 @@ export function browserDetect(dotNetObjectRef) {
 
     var osName = parser.getOS().name;
     var osVersion = parser.getOS().version;
+
+    // getModels() only runs on the iPad/iPhone paths above, so macOS devices
+    // otherwise get an empty DeviceModel. Best-effort fill it here.
+    if ((osName === 'macOS' || osName === 'Mac OS') && deviceModel === '') {
+        deviceModel = getMacModel();
+        if (deviceModel === 'MacBook Neo') {
+            deviceType = 'laptop';
+        }
+    }
 
     var winVer = '';
 
@@ -183,23 +199,27 @@ function isiPadPro() {
     return (screen.width === 2048 && screen.height === 2732) ||
         (screen.width === 2732 && screen.height === 2048) ||
         (screen.width === 1536 && screen.height === 2048) ||
-        (screen.width === 2048 && screen.height === 1536);
+        (screen.width === 2048 && screen.height === 1536) ||
+        (screen.width === 1668 && screen.height === 2388) ||
+        (screen.width === 2388 && screen.height === 1668) ||
+        (screen.width === 1668 && screen.height === 2224) ||
+        (screen.width === 2224 && screen.height === 1668) ||
+        (screen.width === 1622 && screen.height === 2420) ||
+        (screen.width === 2420 && screen.height === 1622) ||
+        (screen.width === 2064 && screen.height === 2752) ||
+        (screen.width === 2752 && screen.height === 2064);
 }
 
 function isDesktop() {
-    if ((navigator.userAgent.match(/iPhone/i)) ||
-        (navigator.userAgent.match(/(up.browser|up.link|mmp|symbian|smartphone|midp|wap|vodafone|o2|pocket|kindle|mobile|pda|psp|treo)/i)) ||
-        (navigator.userAgent.match(/iPod/i)) ||
-        (navigator.userAgent.match(/operamini/i)) ||
-        (navigator.userAgent.match(/blackberry/i)) ||
-        (navigator.userAgent.match(/(palmos|palm|hiptop|avantgo|plucker|xiino|blazer|elaine)/i)) ||
-        (navigator.userAgent.match(/(windowsce; ppc;|windows ce;smartphone;|windows ce; iemobile) /i)) ||
-        (navigator.userAgent.match(/android/i)) || isiOS() || isiPadOS() || isiPadPro()) {
+    var ua = navigator.userAgent;
+    if (/iPhone|iPod|android|operamini|blackberry/i.test(ua) ||
+        /(up\\.browser|up\\.link|mmp|symbian|smartphone|midp|wap|vodafone|o2|pocket|kindle|mobile|pda|psp|treo)/i.test(ua) ||
+        /(palmos|palm|hiptop|avantgo|plucker|xiino|blazer|elaine)/i.test(ua) ||
+        /(windowsce; ppc;|windows ce;smartphone;|windows ce; iemobile) /i.test(ua) || 
+        isiOS() || isiPadOS() || isiPadPro()) {
         return false;
     }
-    else {
-        return true;
-    }
+    return true;
 }
 
 function OSVersion() {
@@ -279,31 +299,34 @@ function OSVersion() {
 
 var canvas, gl, glRenderer, models,
     devices = [
-        ['a7', '640x1136', ['iPhone 5', 'iPhone 5s']],
-        ['a7', '1536x2048', ['iPad Air', 'iPad Mini 2', 'iPad Mini 3', 'iPad Pro 9.7']],
-        ['a8', '640x1136', ['iPod touch (6th gen)']],
-        ['a8', '750x1334', ['iPhone 6']],
-        ['a8', '1242x2208', ['iPhone 6 Plus']],
-        ['a8', '1536x2048', ['iPad Air 2', 'iPad Mini 4']],
-        ['a9', '640x1136', ['iPhone SE']],
-        ['a9', '750x1334', ['iPhone 6s']],
-        ['a9', '1242x2208', ['iPhone 6s Plus']],
-        ['a9x', '1536x2048', ['iPad Pro (1st gen 9.7-inch)']],
-        ['a9x', '2048x2732', ['iPad Pro (1st gen 12.9-inch)']],
-        ['a10', '750x1334', ['iPhone 7']],
-        ['a10', '1242x2208', ['iPhone 7 Plus']],
-        ['a10x', '1668x2224', ['iPad Pro (2th gen 10.5-inch)']],
-        ['a10x', '2048x2732', ['iPad Pro (2th gen 12.9-inch)']],
-        ['a11', '750x1334', ['iPhone 8']],
-        ['a11', '1242x2208', ['iPhone 8 Plus']],
-        ['a11', '1125x2436', ['iPhone X']],
-        ['a12', '828x1792', ['iPhone Xr']],
-        ['a12', '1125x2436', ['iPhone Xs']],
-        ['a12', '1242x2688', ['iPhone Xs Max']],
-        ['a12x', '1668x2388', ['iPad Pro (3rd gen 11-inch)']],
-        ['a12x', '2048x2732', ['iPad Pro (3rd gen 12.9-inch)']],
-        ['a15', '2556x1179', ['iPhone 14']],
-        ['a15', '2796x1290', ['iPhone 14 Max']]
+        ['', '640x1136', ['iPhone 5', 'iPhone 5c', 'iPhone 5s', 'iPhone SE (1st gen)', 'iPod touch (6th/7th gen)']],
+        ['', '750x1334', ['iPhone 6', 'iPhone 6s', 'iPhone 7', 'iPhone 8', 'iPhone SE (2nd/3rd gen)']],
+        ['', '1242x2208', ['iPhone 6 Plus', 'iPhone 6s Plus', 'iPhone 7 Plus', 'iPhone 8 Plus']],
+        ['', '1125x2436', ['iPhone X', 'iPhone Xs', 'iPhone 11 Pro']],
+        ['', '828x1792', ['iPhone Xr', 'iPhone 11']],
+        ['', '1242x2688', ['iPhone Xs Max', 'iPhone 11 Pro Max']],
+        ['', '1080x2340', ['iPhone 12 mini', 'iPhone 13 mini']],
+        ['', '1170x2532', ['iPhone 12', 'iPhone 12 Pro', 'iPhone 13', 'iPhone 13 Pro', 'iPhone 14', 'iPhone 16e']],
+        ['', '1284x2778', ['iPhone 12 Pro Max', 'iPhone 13 Pro Max', 'iPhone 14 Plus']],
+        ['', '1179x2556', ['iPhone 14 Pro', 'iPhone 15', 'iPhone 15 Pro', 'iPhone 16']],
+        ['', '1290x2796', ['iPhone 14 Pro Max', 'iPhone 15 Plus', 'iPhone 15 Pro Max', 'iPhone 16 Plus']],
+        ['', '1206x2622', ['iPhone 16 Pro', 'iPhone 17', 'iPhone 17 Pro']],
+        ['', '1320x2868', ['iPhone 16 Pro Max', 'iPhone 17 Pro Max']],
+        ['', '1260x2736', ['iPhone Air']],
+        ['', '1536x2048', ['iPad Mini (2/3/4/5th gen)', 'iPad (3/4/5/6th gen)', 'iPad Air (1/2nd gen)', 'iPad Pro (9.7-inch)']],
+        ['', '1488x2266', ['iPad mini (6th/7th gen)']],
+        ['', '1620x2160', ['iPad (7/8/9th gen)']],
+        ['', '1640x2360', ['iPad Air (4/5th gen)', 'iPad (10/11th gen)', 'iPad Air (6th gen 11-inch)', 'iPad Air (M3 11-inch)']],
+        ['', '1668x2224', ['iPad Pro (10.5-inch)', 'iPad Air (3rd gen)']],
+        ['', '1668x2388', ['iPad Pro (11-inch 1/2/3/4th gen)']],
+        ['', '1622x2420', ['iPad Pro (M4 11-inch)']],
+        ['', '2048x2732', ['iPad Pro (12.9-inch 1-6th gen)', 'iPad Air (6th gen 13-inch)', 'iPad Air (M3 13-inch)']],
+        ['', '2064x2752', ['iPad Pro (M4 13-inch)']],
+        ['', '2560x1600', ['MacBook Air (13-inch, M1)', 'MacBook Pro (13-inch)']],
+        ['', '2560x1664', ['MacBook Air (13.6-inch, M2/M3)']],
+        ['', '2880x1864', ['MacBook Air (15.3-inch, M2/M3)']],
+        ['', '3024x1964', ['MacBook Pro (14-inch, M1/M2/M3)']],
+        ['', '3456x2234', ['MacBook Pro (16-inch, M1/M2/M3)']]
     ];
 
 function getCanvas() {
@@ -371,6 +394,35 @@ function getModels() {
     }
 
     return models;
+}
+
+function getMacModel() {
+    var gpu = getGlRenderer();
+    var renderer = (gpu.glRenderer || '').toLowerCase();
+
+    // An A-series GPU in a Mac currently means only one thing: the MacBook Neo.
+    // Works on Chrome/Edge/Firefox; Safari masks the renderer to a generic
+    // "Apple GPU", so this check silently falls through there.
+    //
+    // UNVERIFIED: the exact renderer string has not been confirmed against real
+    // MacBook Neo hardware. If detection misses, capture the value of
+    // WEBGL_debug_renderer_info's UNMASKED_RENDERER_WEBGL on a Neo and report it
+    // on the forum (https://www.puresourcecode.com/forum/browser-detect-for-blazor/)
+    // so this pattern can be tightened.
+    if (/a18/.test(renderer)) {
+        return 'MacBook Neo';
+    }
+
+    // Fallback: resolution lookup against the devices table (also works on
+    // Safari). Same best-effort heuristic used by getModels().
+    var res = getResolution();
+    for (var i = 0; i < devices.length; i++) {
+        if (res === devices[i][1]) {
+            return devices[i][2].toString();
+        }
+    }
+
+    return '';
 }
 
 function getDeviceInfo() {
