@@ -356,19 +356,24 @@ function getGlRenderer() {
 
     if (glRenderer == null) {
         const gl = document.createElement("canvas").getContext("webgl");
-        // try to get the extensions
-        const ext = gl.getExtension("WEBGL_debug_renderer_info");
 
-        // if the extension exists, find out the info.
-        if (ext) {
-            glRenderer = gl.getParameter(ext.UNMASKED_RENDERER_WEBGL);
-            glVendor = gl.getParameter(ext.UNMASKED_VENDOR_WEBGL);
-        }
-        else {
+        try {
+            // try to get the extensions
+            const ext = gl.getExtension("WEBGL_debug_renderer_info");
+
+            // if the extension exists, find out the info.
+            if (ext) {
+                glRenderer = gl.getParameter(ext.UNMASKED_RENDERER_WEBGL);
+                glVendor = gl.getParameter(ext.UNMASKED_VENDOR_WEBGL);
+            }
+            else {
+                glRenderer = "Unknown";
+            }
+        } catch (error) {
             glRenderer = "Unknown";
         }
     }
-
+    
     return { glRenderer, glVendor };
 }
 
